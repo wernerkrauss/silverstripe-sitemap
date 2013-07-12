@@ -65,7 +65,8 @@ class SitemapPage extends Page {
 			$sitemap = '<ul>';
 
 			foreach($set as $page) {
-				if($page->ShowInMenus && $page->ID != $this->ID && $page->canView()) {
+				if(($page->ShowInMenus || $page->ShowInHeaderNav)
+                                        && $page->ID != $this->ID && $page->canView()) {
 					$sitemap .= sprintf (
 						'<li><a href="%s" title="%s">%s</a>',
 						$page->XML_val('Link'),
@@ -82,7 +83,7 @@ class SitemapPage extends Page {
 			}
 
 			return $sitemap .'</ul>';
-		}
+		} 
 	}
 
 	/**
@@ -99,7 +100,10 @@ class SitemapPage extends Page {
 				//return $this->PagesToShow($showInMenus);
 				return $this->PagesToShow();
 			default:
-				return DataObject::get('SiteTree', '"ParentID" = 0 AND "ShowInMenus" = 1');
+//				return DataObject::get('SiteTree', '"ParentID" = 0 AND "ShowInMenus" = 1');
+				return Page::get()
+                                    ->filter(array("ParentID" => 0))
+                                    ->filterAny(array("ShowInMenus" => 1, 'ShowInHeaderNav' =>1));
 		}
 	}
 
